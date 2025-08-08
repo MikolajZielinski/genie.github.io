@@ -1,6 +1,6 @@
 # GENIE
 
-This is the repository that contains source code for the [GENIE website](https://genie.github.io).
+This is the repository that contains source code for the [GENIE website](https://mikolajzielinski.github.io/genie.github.io/).
 
 If you find GENIE useful for your work please cite:
 ```
