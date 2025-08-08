@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Gaussian Encoding for Neural Radiance Fields allows for physic based interactive editing.">
+  <meta name="keywords" content="GENIE, Gaussian Splatting, NeRF">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GENIE: Gaussian Encoding for Neural Radiance Fields Interactive Editing</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">GENIE: Gaussian Encoding for Neural Radiance Fields Interactive Editing</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block" style="color:#2196f3;">
+              Mikołaj Zieliński<sup style="color:black;">1</sup><span style="color:black;">,</span></span>
+            <span class="author-block" style="color:#2196f3;">
+              Krzysztof Byrski<sup style="color:black;">2</sup><span style="color:black;">,</span></span>
+            <span class="author-block" style="color:#2196f3;">
+              Tomasz Szczepanik<sup style="color:black;">2</sup><span style="color:black;">,</span>
+            </span>
+            <span class="author-block" style="color:#2196f3;">
+              Przemysław Spurek<sup style="color:black;">2, 3</sup>
+            </span>
+            </span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>Poznan University of Technology,</span>
+            <span class="author-block"><sup>2</sup>Jagiellonian University,</span>
+            <span class="author-block"><sup>3</sup>IDEAS Research Institute</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <span class="link-block">
+                <a href="https://www.arxiv.org/pdf/2508.02831"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://www.arxiv.org/abs/2508.02831"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href="https://github.com/MikolajZielinski/genie"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+              <!-- Dataset Link. -->
+              <span class="link-block">
+                <a href="https://huggingface.co/datasets/MikolajZ/genie_data"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-database"></i>
+                  </span>
+                  <span>Data</span>
+                  </a>
+
+              <!-- Dataset Link. -->
+              <span class="link-block">
+                <a href="https://huggingface.co/datasets/MikolajZ/genie_demo_data"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-database"></i>
+                  </span>
+                  <span>Demo Data</span>
+                  </a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <img id="teaser" src="./static/images/teaser.pdf" alt="Teaser Image" style="width:100%; height:auto;">
+      <h2 class="subtitle has-text-centered">
+        <span class="dnerf">GENIE</span> allows for editing of NeRFs by moving jointly trained Gaussians.
+      </h2>
+    </div>
+  </div>
+</section>
+
+
+<section class="hero is-light is-small">
+  <div class="hero-body">
+    <div class="container">
+      <div id="results-carousel" class="carousel results-carousel">
+        <div class="item item-ficus">
+          <video poster="" id="ficus" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/ficus.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-rug-cup">
+          <video poster="" id="rug-cup" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/rug-cup.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-pillow-duck">
+          <video poster="" id="pillow-duck" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/pillow-duck.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-hotdog">
+          <video poster="" id="hotdog" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/hotdog.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-lego-soft">
+          <video poster="" id="lego-soft" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/lego-soft.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-materials">
+          <video poster="" id="materials" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/materials.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-pirate-flag">
+          <video poster="" id="pirate-flag" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/pirate-flag.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-lego-move-scoop">
+          <video poster="" id="lego-move-scoop" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/lego-move-scoop.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          Neural Radiance Fields (NeRF) and Gaussian Splatting (GS) have recently transformed 3D scene representation and rendering. 
+          NeRF achieves high-fidelity novel view synthesis by learning volumetric representations through neural networks, 
+          but its implicit encoding makes editing and physical interaction challenging. 
+          In contrast, GS represents scenes as explicit collections of Gaussian primitives, enabling real-time rendering, 
+          faster training, and more intuitive manipulation. 
+          This explicit structure has made GS particularly well-suited for interactive editing and integration with physics-based simulation. 
+          In this paper, we introduce <strong>GENIE</strong> (<strong>G</strong>aussian <strong>E</strong>ncoding for <strong>N</strong>eural Radiance Fields <strong>I</strong>nteractive <strong>E</strong>diting),
+          a hybrid model that combines the photorealistic rendering quality of NeRF with the editable and structured representation of GS. 
+          Instead of using spherical harmonics for appearance modeling, we assign each Gaussian a trainable feature embedding. 
+          These embeddings are used to condition a NeRF network based on the <em>k</em> nearest Gaussians to each query point. To make this conditioning efficient, 
+          we introduce <strong>RT-GPS</strong> (<strong>R</strong>ay-<strong>T</strong>raced <strong>G</strong>aussian <strong>P</strong>roximity <strong>S</strong>earch), a fast nearest Gaussian search based on a modified ray-tracing pipeline. 
+          We also integrate a multi-resolution hash grid to initialize and update Gaussian features. 
+          Together, these components enable real-time, locality-aware editing: as Gaussian primitives are repositioned or modified, 
+          their interpolated influence is immediately reflected in the rendered output. 
+          By combining the strengths of implicit and explicit representations, <strong>GENIE</strong> supports intuitive scene manipulation, 
+          dynamic interaction, and compatibility with physical simulation, bridging the gap between geometry-based editing and neural rendering.
+        </div>
+      </div>
+    </div>
+    <!--/ Abstract. -->
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+
+    <div class="is-centered">
+
+      <!-- Editing. -->
+      <div class="column">
+        <div class="content">
+          <h2 class="title is-3">Editing</h2>
+          <p>
+            <strong>GENIE</strong> makes it super easy to edit 3D scenes - just move or tweak the Gaussians directly!  
+            In this demo, the Gaussians are visually exaggerated to show how they follow the motion of the dozer and animate the scoop, all driven by simple mesh deformation.
+          </p>
+          <video id="dollyzoom" autoplay muted loop playsinline height="100%">
+            <source src="./static/videos/Lego-move-gaussians.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+      </div>
+      <!--/ Editing. -->
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+
+    <div class="columns is-centered">
+
+      <!-- Manual Edits. -->
+      <div class="column">
+        <div class="content">
+          <h2 class="title is-3">Manual Edits</h2>
+          <p>
+            <strong>GENIE</strong> lets you manually adjust parts of a scene by moving Gaussians directly.
+            Here, we tweaked the hotdogs on a plate to make it fly just by dragging points around.
+          </p>
+          <video id="dollyzoom" autoplay muted loop playsinline height="100%">
+            <source src="./static/videos/hotdog.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+      </div>
+      <!--/ Manual Edits. -->
+
+      <!-- Physical Simulations. -->
+      <div class="column">
+        <h2 class="title is-3">Physical Simulations</h2>
+        <div class="columns is-centered">
+          <div class="column content">
+            <p>
+              With <strong>GENIE</strong>, you can apply physical simulations like soft body dynamics or cloth drops.  
+              This clip shows a Lego dozer being dropped, with the deformation driven entirely by a mesh-based simulation.
+            </p>
+            <video id="matting-video" autoplay muted loop playsinline height="100%">
+              <source src="./static/videos/lego-soft.mp4"
+                      type="video/mp4">
+            </video>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <!--/ Physical Simulations. -->
+
+    <!-- Real World Edits. -->
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Real World Edits</h2>
+        <div class="content has-text-justified">
+          <p>
+            This section shows two examples of real-world edits using <strong>GENIE</strong>.  
+            In one demo, a plant pot falls and bounces off a tilted table as part of a physics simulation.
+            In the other, a soft plasticine Lego dozer is squashed by applying a force.
+          </p>
+        </div>
+        <div class="columns is-centered">
+          <div class="column">
+            <video autoplay muted loop controls playsinline height="100%">
+              <source src="./static/videos/garden-fall.mp4"
+                      type="video/mp4">
+            </video>
+          </div>
+          <div class="column">
+            <video autoplay muted loop controls playsinline height="100%">
+              <source src="./static/videos/kitchen-squish.mp4"
+                      type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--/ Real World Edits. -->
+
+    <!-- Interactive Demo. -->
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Interactive Demo</h2>
+
+        <!-- Interactive Demo. -->
+        <div class="content has-text-justified">
+          <p>
+            This demo lets you play with a pre-rendered animation of a fox from InstantNGP.
+            Use the slider below to smoothly adjust the fox’s head position.
+          </p>
+        </div>
+          <div class="column interpolation-video-column" style="max-width: 400px; margin: 0 auto;">
+            <div id="interpolation-image-wrapper" style="max-height: 400px; overflow: hidden; display: flex; justify-content: center;">
+              Loading...
+            </div>
+            <input class="slider is-fullwidth is-large is-info"
+                   id="interpolation-slider"
+                   step="1" min="0" max="119" value="0" type="range">
+          </div>
+        </div>
+        <br/>
+        <!--/ Interactive Demo. -->
+
+      </div>
+    </div>
+    <!--/ Interactive Demo. -->
+
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column">
+        <h2 class="title is-3">NeuralEditor</h2>
+        <div class="content has-text-justified">
+          <p>
+            In our paper, we compare <strong>GENIE</strong> with <a href="https://immortalco.github.io/NeuralEditor/" target="_blank">NeuralEditor</a>.  
+            Here, you can see the NeRF-Synthetic objects edited in the same way.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="hero-body">
+    <div class="container">
+      <div id="results-carousel-2" class="carousel results-carousel">
+        <div class="item item-neuraleditor-ficus">
+          <video poster="" id="neuraleditor-ficus" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/neuraleditor-ficus.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-neuraleditor-drums">
+          <video poster="" id="neuraleditor-drums" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/neuraleditor-drums.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-neuraleditor-hotdog">
+          <video poster="" id="neuraleditor-hotdog" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/neuraleditor-hotdog.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-neuraleditor-chair">
+          <video poster="" id="neuraleditor-chair" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/neuraleditor-chair.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-neuraleditor-lego">
+          <video poster="" id="neuraleditor-lego" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/neuraleditor-lego.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-neuraleditor-materials">
+          <video poster="" id="neuraleditor-materials" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/neuraleditor-materials.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-neuraleditor-mic">
+          <video poster="" id="neuraleditor-mic" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/neuraleditor-mic.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+        <div class="item item-neuraleditor-ship">
+          <video poster="" id="neuraleditor-ship" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/neuraleditor-ship.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section" id="Citation">
+  <div class="container is-max-desktop content">
+    <h2 class="title">Citation</h2>
+    If you find this work useful, please consider citing it:
+    <br><br>
+    <pre><code>@misc{zielinski2025genie,
+      title = {GENIE: Gaussian Encoding for Neural Radiance Fields Interactive Editing},
+      author = {Miko\l{}aj Zieli\'{n}ski and Krzysztof Byrski and Tomasz Szczepanik and Przemys\l{}aw Spurek},
+      year = {2025},
+      eprint = {2508.02831},
+      archivePrefix = {arXiv},
+      url = {https://arxiv.org/abs/2508.02831}
+}</code></pre>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <a class="icon-link" href="https://github.com/MikolajZielinski" class="external-link" disabled>
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p style="text-align: center;">
+            Thanks to the authors of the <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a> for sharing their amazing source code and website template.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
